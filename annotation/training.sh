@@ -21,11 +21,14 @@ grep -c "LOCUS" genes.raw.gb genes.gb
 
 
 #https://vcru.wisc.edu/simonlab/bioinformatics/programs/augustus/docs/tutorial2015/training.html
-~/programs/augustus-3.2/scripts/randomSplit.pl genes.raw.gb 100 #normally you would use gene.gb here, but this dataset is sparse
+iget -rPT /iplant/home/shared/Botany2020NMGWorkshop/Annotation
+
+/opt/augustus-3.2.2/scripts/randomSplit.pl genes.raw.gb 100 #normally you would use gene.gb here, but this dataset is sparse
 
 grep -c LOCUS genes.raw.gb*
 
-~/programs/augustus-3.2/scripts/new_species.pl --species=Ugibba
+sudo chown srs57 /opt/augustus/config/species/
+/opt/augustus-3.2.2/scripts/new_species.pl --species=Ugibba
 
 etraining --species=Ugibba genes.raw.gb.train
 
