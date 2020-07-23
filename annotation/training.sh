@@ -1,3 +1,6 @@
+#################################################
+#.   The following has been done for you.       #
+#################################################
 
 #extract proteins from mikado output and remove ones with a single exon 
 gffread -U -J  -y mikado_prot.fasta -g Ugibba_FLYE_assembly.fasta.PolcaCorrected.fa  mikado.loci.gff3 #I didn't use -JU since it removed too many
@@ -20,6 +23,9 @@ cat train.err | perl -pe 's/.*in sequence (\S+): .*/$1/' > badgenes.lst
 grep -c "LOCUS" genes.raw.gb genes.gb
 
 
+##################################################################
+#.  These steps you will need to do on Atmosphere commandline.   #
+##################################################################
 #https://vcru.wisc.edu/simonlab/bioinformatics/programs/augustus/docs/tutorial2015/training.html
 iget -rPT /iplant/home/shared/Botany2020NMGWorkshop/Annotation
 
@@ -35,3 +41,4 @@ etraining --species=Ugibba genes.raw.gb.train
 ls -ort $AUGUSTUS_CONFIG_PATH/species/Ugibba
 
 augustus --species=Ugibba genes.raw.gb.test | tee firsttest.out
+  ######This is a really lousy training set!!!!
