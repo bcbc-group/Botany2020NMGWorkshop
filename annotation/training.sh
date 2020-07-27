@@ -1,27 +1,41 @@
 #################################################
 #.   The following has been done for you.       #
 #################################################
+#count proteins in mikado output
+awk '$3 == "gene" {print $0}' mikado.loci.gff3 |wc
 
 #extract proteins from mikado output and remove ones with a single exon 
-gffread -U -J  -y mikado_prot.fasta -g Ugibba_FLYE_assembly.fasta.PolcaCorrected.fa  mikado.loci.gff3 #I didn't use -JU since it removed too many
+gffread -U -J  -y mikado_prot.fasta -g contig_15.fasta  mikado.loci.gff3 #I didn't use -JU since it removed too many
+
+#use orthofinder to remove redundancy; orthofinder_input contains two copies of mikado_prot.fasta 
+/tools/OrthoFinder-2.3.3/orthofinder -t 7 -a 7 -f orthofinder_input/
+
+cut -f2 OrthoFinder/Results_Jul27_1/Orthogroups/Orthogroups.tsv |cut -f1 -d " " > groups.txt
+
+git clone https://github.com/solgenomics/sgn-biotools.git
+
+sed 's/ gene=mikado.*//g' mikado_prot.fasta > mikado_prot2.fasta
+
+sgn-biotools/bin/fasta_extract.pl -f mikado_prot2.fasta -i orthofinder_input/OrthoFinder/Results_Jul27_1/Orthogroups/groups.txt -z fasta -o mikado_proteins_training
 
 #run scipio to get genbank file
-/tools/scipio-1.4/scipio.1.4.1.pl --blat_output=prot.vs.genome.psl Ugibba_FLYE_assembly.fasta.PolcaCorrected.fa mikado_prot.fasta > scipio.yaml
+/opt/scipio-1.4/scipio.1.4.1.pl --blat_output=prot.vs.genome.psl contig_15.fasta mikado_prot_training.fasta > scipio.yaml #runs awhile
 
-cat scipio.yaml | /tools/scipio-1.4/yaml2gff.1.4.pl > scipio.scipiogff
+cat scipio.yaml | /opt/scipio-1.4/yaml2gff.1.4.pl > scipio.scipiogff
 
-~/programs/augustus-3.2/scripts/scipiogff2gff.pl --in=scipio.scipiogff --out=scipio.gff
+/opt/augustus-3.2.2/scripts/scipiogff2gff.pl --in=scipio.scipiogff --out=scipio.gff
 
-cat scipio.yaml | /tools/scipio-1.4/yaml2log.1.4.pl > scipio.log
+cat scipio.yaml | /opt/scipio-1.4/yaml2log.1.4.pl > scipio.log
 
-~/programs/augustus-3.2/scripts/gff2gbSmallDNA.pl scipio.gff Ugibba_FLYE_assembly.fasta.PolcaCorrected.fa 1000 genes.raw.gb
+/opt/augustus-3.2.2/scripts/gff2gbSmallDNA.pl scipio.gff contig_15.fasta 1000 genes.raw.gb
 
 etraining --species=generic --stopCodonExcludedFromCDS=true genes.raw.gb 2> train.err
 
 cat train.err | perl -pe 's/.*in sequence (\S+): .*/$1/' > badgenes.lst
-~/programs/augustus-3.2/scripts/filterGenes.pl badgenes.lst genes.raw.gb > genes.gb
-grep -c "LOCUS" genes.raw.gb genes.gb
 
+/opt/augustus-3.2.2/scripts/filterGenes.pl badgenes.lst genes.raw.gb > genes.gb
+
+grep -c "LOCUS" genes.raw.gb genes.gb
 
 ##################################################################
 #.  These steps you will need to do on Atmosphere commandline.   #
@@ -29,7 +43,7 @@ grep -c "LOCUS" genes.raw.gb genes.gb
 #https://vcru.wisc.edu/simonlab/bioinformatics/programs/augustus/docs/tutorial2015/training.html
 iget -rPT /iplant/home/shared/Botany2020NMGWorkshop/Annotation
 
-/opt/augustus-3.2.2/scripts/randomSplit.pl genes.raw.gb 100 #normally you would use gene.gb here, but this dataset is sparse
+/opt/augustus-3.2.2/scripts/randomSplit.pl genes.raw.gb 200 #normally you would use gene.gb here, but this dataset is sparse
 
 grep -c LOCUS genes.raw.gb*
 
@@ -41,4 +55,4 @@ etraining --species=Ugibba genes.raw.gb.train
 ls -ort $AUGUSTUS_CONFIG_PATH/species/Ugibba
 
 augustus --species=Ugibba genes.raw.gb.test | tee firsttest.out
-  ######This is a really lousy training set!!!!
+
