@@ -43,6 +43,7 @@ grep -c "LOCUS" genes.raw.gb genes.gb
 #https://vcru.wisc.edu/simonlab/bioinformatics/programs/augustus/docs/tutorial2015/training.html
 iget -rPT /iplant/home/shared/Botany2020NMGWorkshop/Annotation
 
+#train augustus
 /opt/augustus-3.2.2/scripts/randomSplit.pl genes.raw.gb 200 #normally you would use gene.gb here, but this dataset is sparse
 
 grep -c LOCUS genes.raw.gb*
@@ -56,3 +57,5 @@ ls -ort $AUGUSTUS_CONFIG_PATH/species/Ugibba
 
 augustus --species=Ugibba genes.raw.gb.test | tee firsttest.out
 
+#train snap (http://weatherby.genetics.utah.edu/MAKER/wiki/index.php/MAKER_Tutorial_for_GMOD_Online_Training_2014#Ab_Initio_Gene_Prediction) under "Training ab initio Gene Predictors"
+#you can use the  same training set used in augustus
