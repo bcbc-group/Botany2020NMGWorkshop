@@ -7,7 +7,7 @@ emacs maker_opts.ctl
 #protein=uniprot_sprot_plants.fasta
 #model_org= #all
 #repeat_protein= #/opt/maker/data/te_proteins.fasta 
-#snaphmm= #snap2.hmm
+#snaphmm=Ugibba_snap.hmm
 #augustus_species=Ugibba
 #pred_gff=mikado.loci.gff3
 #est2genome=0
