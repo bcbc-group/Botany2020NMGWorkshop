@@ -1,6 +1,6 @@
-#################################################
-#.   The following has been done for you.       #
-#################################################
+###################################################################################################################################
+#.   You can find intermediate files from the below commands at /iplant/home/shared/Botany2020NMGWorkshop/annotation/2transfer    #
+###################################################################################################################################
 #count proteins in mikado output
 awk '$3 == "gene" {print $0}' mikado.loci.gff3 |wc
 
