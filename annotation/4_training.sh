@@ -5,7 +5,7 @@
 awk '$3 == "gene" {print $0}' mikado.loci.gff3 |wc
 
 #extract proteins from mikado output and remove ones with a single exon 
-gffread -U -J  -y mikado_prot.fasta -g contig_15.fasta  mikado.loci.gff3 #I didn't use -JU since it removed too many
+gffread -U -J  -y mikado_prot.fasta -g contig_15.fasta  mikado.loci.gff3 
 
 #use orthofinder to remove redundancy; orthofinder_input contains two copies of mikado_prot.fasta 
 /tools/OrthoFinder-2.3.3/orthofinder -t 7 -a 7 -f orthofinder_input/
@@ -43,18 +43,24 @@ grep -c "LOCUS" genes.raw.gb genes.gb
 #https://vcru.wisc.edu/simonlab/bioinformatics/programs/augustus/docs/tutorial2015/training.html
 iget -rPT /iplant/home/shared/Botany2020NMGWorkshop/Annotation
 
-#train augustus
-/opt/augustus-3.2.2/scripts/randomSplit.pl genes.raw.gb 200 #normally you would use gene.gb here, but this dataset is sparse
+#randomly split set to training and test sets
+/opt/augustus-3.2.2/scripts/randomSplit.pl genes.gb 200 
 
 grep -c LOCUS genes.raw.gb*
 
+#change permissions on folder so its contents can be edited
 sudo chown srs57 /opt/augustus/config/species/
+
+#create the new species conf
 /opt/augustus-3.2.2/scripts/new_species.pl --species=Ugibba
 
+#train augustus
 etraining --species=Ugibba genes.raw.gb.train
 
+#look at new files created
 ls -ort $AUGUSTUS_CONFIG_PATH/species/Ugibba
 
+#test the training
 augustus --species=Ugibba genes.raw.gb.test | tee firsttest.out
 
 #train snap (http://weatherby.genetics.utah.edu/MAKER/wiki/index.php/MAKER_Tutorial_for_GMOD_Online_Training_2014#Ab_Initio_Gene_Prediction) under "Training ab initio Gene Predictors"
