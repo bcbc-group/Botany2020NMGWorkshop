@@ -13,14 +13,14 @@ emacs maker_opts.ctl
 #est2genome=0
 #protein2genome=0
 
-screen -L mpirun -np 7 maker -base maker1
-#put maker output on datastore
+#run maker
+screen -L mpirun -np 7 maker -base maker1       #output on CyVerse data store
 
 #make a gff3 files from maker results
 gff3_merge -d maker1.maker.output/maker1_master_datastore_index.log
 gff3_merge -g -o maker1_models.gff -d maker1.maker.output/maker1_master_datastore_index.log
 
-#maker a protein file from maker output
+#make a protein file from maker output
 gffread -g contig_15.fasta -y maker1_proteins.fasta maker1_models.gff
 
 #run BUSCO
