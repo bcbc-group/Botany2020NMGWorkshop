@@ -27,7 +27,7 @@ cat scipio.yaml | /opt/scipio-1.4/yaml2gff.1.4.pl > scipio.scipiogff
 
 cat scipio.yaml | /opt/scipio-1.4/yaml2log.1.4.pl > scipio.log
 
-/opt/augustus-3.2.2/scripts/gff2gbSmallDNA.pl scipio.gff contig_15.fasta 1000 genes.raw.gb
+/opt/augustus-3.2.2/scripts/gff2gbSmallDNA.pl scipio.gff contig_15.fasta 1000 genes.gb
 
 etraining --species=generic --stopCodonExcludedFromCDS=true genes.raw.gb 2> train.err
 
@@ -46,7 +46,7 @@ iget -rPT /iplant/home/shared/Botany2020NMGWorkshop/Annotation
 #randomly split set to training and test sets
 /opt/augustus-3.2.2/scripts/randomSplit.pl genes.gb 200 
 
-grep -c LOCUS genes.raw.gb*
+grep -c LOCUS genes.gb*
 
 #change permissions on folder so its contents can be edited
 sudo chown srs57 /opt/augustus/config/species/
@@ -55,13 +55,13 @@ sudo chown srs57 /opt/augustus/config/species/
 /opt/augustus-3.2.2/scripts/new_species.pl --species=Ugibba
 
 #train augustus
-etraining --species=Ugibba genes.raw.gb.train
+etraining --species=Ugibba genes.gb.train
 
 #look at new files created
 ls -ort $AUGUSTUS_CONFIG_PATH/species/Ugibba
 
 #test the training
-augustus --species=Ugibba genes.raw.gb.test | tee firsttest.out
+augustus --species=Ugibba genes.gb.test | tee firsttest.out
 
 #train snap (http://weatherby.genetics.utah.edu/MAKER/wiki/index.php/MAKER_Tutorial_for_GMOD_Online_Training_2014#Ab_Initio_Gene_Prediction) under "Training ab initio Gene Predictors"
 #you can use the  same training set used in augustus
