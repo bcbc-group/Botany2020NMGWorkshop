@@ -1,26 +1,26 @@
 #!/bin/sh
 ###############################################################
-# pipeline for running hisat2  on multiple single end files   #
+# pipeline for running hisat2 on paired end files   #
 #                                                             #
 # usage:                                                      #
 #                                                             #
-#      hisat_se_annot.sh $base_dir                            #
+#      hisat_pe_annot.sh $base_dir $CPU                       #
 #                                                             #
 ###############################################################
-#input_file-directory=$1
 
 cd $1
 CPU=$2
 
-#index reference file
-hisat2-build Ugibba_FLYE_assembly.fasta.PolcaCorrected.fa Ugibba_FLYE_assembly.fasta.PolcaCorrected
+#index reference fasta file; We will use only contig_15 for demo purposes
+/opt/hisat2-2.1.0/hisat2-build contig_15.fasta contig_15
 
-#map reads to reference
-for file in `dir -d *.fastq.gz` ; do
+#map RNA-seq reads to reference genome fasta file
+for file in `dir -d *_1.fastq` ; do
 
-    samfile=`echo "$file" | sed 's/.fastq.gz/.sam/'`
+    samfile=`echo "$file" | sed 's/_1.fastq/.sam/'`
+    file2=`echo "$file" | sed 's/_1.fastq/_2.fastq/'`
     
-    hisat2 --max-intronlen 100000 --dta -p $CPU -x Ugibba_FLYE_assembly.fasta.PolcaCorrected -U $file -S $samfile
+    /opt/hisat2-2.1.0/hisat2 --max-intronlen 100000 --dta -p $CPU -x contig_15 -1 $file -2 $file2 -S $samfile   
 
 done
 
@@ -46,11 +46,11 @@ done
 
 cat *.csv > mapping_efficiency.csv
 
-#run stringtie
+#run stringtie to get gtf files of transcript annotations
 for file in `dir -d *sort.bam` ; do
     
-    outdir=`echo "$file" |sed 's/.bam//'`
+    outdir=`echo "$file" |sed 's/.bam/.gtf/'`
     
-    stringtie --rf -p $CPU -o $outdir $file
+    /opt/stringtie-2.1.4.Linux_x86_64/stringtie --rf -p $CPU -o $outdir $file
 
 done
