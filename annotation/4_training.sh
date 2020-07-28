@@ -29,13 +29,13 @@ cat scipio.yaml | /opt/scipio-1.4/yaml2log.1.4.pl > scipio.log
 
 /opt/augustus-3.2.2/scripts/gff2gbSmallDNA.pl scipio.gff contig_15.fasta 1000 genes.gb
 
-etraining --species=generic --stopCodonExcludedFromCDS=true genes.raw.gb 2> train.err
+etraining --species=generic --stopCodonExcludedFromCDS=true genes.gb 2> train.err
 
 cat train.err | perl -pe 's/.*in sequence (\S+): .*/$1/' > badgenes.lst
 
-/opt/augustus-3.2.2/scripts/filterGenes.pl badgenes.lst genes.raw.gb > genes.gb
+/opt/augustus-3.2.2/scripts/filterGenes.pl badgenes.lst genes.gb > genes.gb
 
-grep -c "LOCUS" genes.raw.gb genes.gb
+grep -c "LOCUS" genes.*
 
 ##################################################################
 #.  These steps you will need to do on Atmosphere commandline.   #
